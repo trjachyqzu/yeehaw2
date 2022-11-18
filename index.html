@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+
+  <meta property="og:title" content="Listen, denoise, action! Audio-driven motion synthesis with diffusion models" />
+  <meta property="og:url" content="https://speech.kth.se/research/listen-denoise-action/" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+
+
+  <title>Listen, denoise, action! Audio-driven motion synthesis with diffusion models</title>
+
+  <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro" rel="stylesheet">
+  <link rel="icon" href="static/figures/icon2.png">
+
+  <link rel="stylesheet" href="static/css/bulma.min.css">
+  <link rel="stylesheet" href="static/css/bulma-carousel.min.css">
+  <link rel="stylesheet" href="static/css/bulma-slider.min.css">
+  <link rel="stylesheet" href="static/css/fontawesome.all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+  <link rel="stylesheet" href="static/css/index.css">
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://documentcloud.adobe.com/view-sdk/main.js"></script>
+  <script defer src="static/js/fontawesome.all.min.js"></script>
+  <script src="static/js/bulma-carousel.min.js"></script>
+  <script src="static/js/bulma-slider.min.js"></script>
+  <script src="static/js/index.js"></script>
+</head>
+
+<body>
+
+
+  <section class="publication-header">
+    <div class="hero-body">
+      <div class="container is-max-widescreen">
+        <!-- <div class="columns is-centered"> -->
+        <div class="column has-text-centered">
+          <h1 class="title is-1 publication-title">Listen, denoise, action! Audio-driven motion synthesis with diffusion
+            models</h1>
+          <div class="is-size-3 publication-authors">
+            <!-- <span class="eql-cntrb"><small><br><sup>*</sup>Indicates Equal Contribution</small></span> -->
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </section>
+
+  <section class="publication-author-block">
+    <div class="hero-body">
+      <div class="container is-max-desktop">
+        <div class="columns is-centered">
+          <div class="column has-text-centered">
+            <div class="is-size-5 publication-authors">
+
+              <span class="author-block">
+                <a href="https://scholar.google.com/citations?user=qH7NHPgAAAAJ&hl=en">Simon Alexanderson</a>,
+              </span>
+
+              <span class="author-block">
+                <a href="https://nagyrajmund.github.io/">Rajmund Nagy</a>,
+              </span>
+              <span class="author-block">
+                <a href="https://scholar.google.ca/citations?user=G33Tyb0AAAAJ">Jonas Beskow</a>,
+              </span>
+              <span class="author-block">
+                <a href="https://people.kth.se/~ghe/">Gustav Eje Henter</a>
+              </span>
+            </div>
+
+            <div class="is-size-5 publication-authors">
+              <span class="author-block">KTH Royal Institute of Technology, Sweden</span>
+              <!-- <span class="eql-cntrb"><small><br><sup>*</sup>Indicates Equal Contribution</small></span> -->
+            </div>
+            <div class="column has-text-centered">
+              <div class="publication-links">
+                <span class="link-block">
+                  <a href="https://arxiv.org/abs/2211.09707" target="_blank"
+                    class="external-link button is-normal is-rounded">
+                    <span class="icon">
+                      <i class="ai ai-arxiv"></i>
+                    </span>
+                    <span>arXiv</span>
+                  </a>
+                </span>
+
+                <!-- PDF Link. -->
+                <!--              <span class="link-block">-->
+                <!--                <a href="static/source/MotionCLIP.pdf" target="_blank"-->
+                <!--                  class="external-link button is-normal is-rounded">-->
+                <!--                  <span class="icon">-->
+                <!--                    <i class="fas fa-file-pdf"></i>-->
+                <!--                  </span>-->
+                <!--                  <span>Paper</span>-->
+                <!--                </a>-->
+                <!--              </span>-->
+                <!--                            </span>-->
+                <!-- </span> -->
+                <!-- Colab Link. -->
+                <span class="link-block">
+                  <a target="_blank" class="external-link button is-normal is-rounded">
+                    <span class="icon">
+                      <i class="fab fa-github"></i>
+                    </span>
+                    <span>Code (will be released later)</span>
+                  </a>
+
+                </span>
+                <!-- </span> -->
+                <!-- Colab Link. -->
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 
+<section class="hero is-small">
+  <!~~ <div class="hero-body"> ~~>
+<section class="hero teaser">
+  <div class="container is-max-desktop">
+    <div class="hero-body">
+      <!~~ <div id="results-carousel" class="carousel results-carousel"> ~~>
+      <div class="container">
+      <div class="item">
+      <div class="column is-centered has-text-centered">
+        <img src="static/figures/teaser.png" alt="MotionCLIP"/>
+      </div>
+
+    </div>
+  </div>
+ <!~~  </div> ~~>
+  </div>
+  </div>
+ <!~~  </div> ~~>
+</section>
+ -->
+
+  <section class="section hero is-light">
+    <div class="container is-max-desktop">
+      <!-- Abstract. -->
+      <div class="columns is-centered has-text-centered">
+        <div class="column is-four-fifths">
+          <div class="item">
+            <p style="margin-bottom: 30px">
+
+              <video poster="" id="tree" controls loop height="100%">
+                <source src="resources/dance/compr/Dance_Casual_002.mp4" type="video/mp4">
+              </video>
+
+              <!-- <iframe width="720" height="405" src="https://www.youtube.com/embed/rVkIDj5wgjs" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe> -->
+            </p>
+          </div>
+          <h2 class="title is-3">Summary</h2>
+          <div class="content has-text-justified">
+            <p>
+              We present a new diffusion model for audio-driven motion synthesis, based on the Conformer architecture.
+              We demonstrate that our model is able to generate full-body gestures and dancing with top-of-the-line
+              motion
+              quality, with distinctive styles whose expression can be made more or less pronounced.
+              <br>
+              Finally, we generalise the classifier-free guidance procedure to perform style interpolation in a manner
+              that has connections to product-of-experts models, and enables style interpolation.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+
+  <section class="hero is-small">
+    <div class="hero-body">
+      <div class="container">
+
+        <div class="column is-centered has-text-centered">
+          <img src="resources/architecture.png" />
+        </div>
+
+
+      </div>
+    </div>
+    </div>
+  </section>
+
+
+  <section class="section hero is-light">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered has-text-centered">
+        <div class="column is-four-fifths">
+          <div class="content has-text-justified">
+            <p>
+              The architecture of our denoising diffusion model consists of a stack <em>Conformer</em> layers, which
+              replace the feedforward networks in Transformers with convolutional layers. Unlike recent diffusion models
+              for motion, we use translation-invariant position embeddings to generalise to arbitrary sequence lengths.
+              <br><br>
+              Using the same hyperparameters, we trained models for gesture generation, dance synthesis, and path-driven
+              locomotion.
+            </p>
+          </div>
+        </div>
+      </div>
+      <!--/ Abstract. -->
+    </div>
+  </section>
+
+
+  <!-- 
+<section class="hero is-small">
+  <div class="hero-body">
+    <div class="container">
+
+      <div class="column is-centered has-text-centered">
+        <img src="static/figures/sampling.png" alt="cars peace"/>
+      </div>
+     
+    
+  </div>
+</div>
+</div>
+</section>
+ -->
+
+
+
+  <section class="hero is-small">
+    <div class="hero-body">
+      <div class="container">
+        <div class="column is-centered has-text-centered">
+          <h2 class="title is-4">Our models can generate spontaneous gestures from speech</h2>
+        </div>
+        <div id="results-carousel" class="carousel results-carousel">
+          <div class="column is-centered has-text-centered">
+            <video poster="" controls loop playsinline style="padding: 20px; width: 80%;">
+              <source src="resources/tsg_good_examples/compr/TestSeq001_3_GD_v13_000.mp4" type="video/mp4">
+            </video>
+          </div>
+          <div class="column is-centered has-text-centered">
+            <video poster="" controls loop playsinline style="padding: 20px; width: 80%">
+              <source src="resources/tsg_good_examples/compr/TestSeq002_2_GD_v13_000.mp4" type="video/mp4">
+            </video>
+          </div>
+          <div class="column is-centered has-text-centered">
+            <video poster="" controls loop playsinline style="padding: 20px; width: 80%">
+              <source src="resources/tsg_good_examples/compr/TestSeq002_3_GD_v13_000.mp4" type="video/mp4">
+            </video>
+          </div>
+          <div class="column is-centered has-text-centered">
+            <video poster="" controls loop playsinline style="padding: 20px; width: 80%">
+              <source src="resources/tsg_good_examples/compr/TestSeq006_2_GD_v13_000.mp4" type="video/mp4">
+            </video>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- <section class="section hero is-light">
+    <div class="container is-max-desktop"> -->
+  <!-- Abstract. -->
+  <!-- <div class="columns is-centered has-text-centered">
+        <div class="column is-four-fifths">
+          <h2 class="title is-3">Text-to-Motion</h2>
+          <p>
+            Text-to-motion is the task of generating motion given an input text prompt.
+            The output motion is expected to be both implementing the textual description, and a valid sample from the
+            data distribution (i.e. adhering to general human abilities and the rules of physics).
+            In addition, for each text prompt, we also expect a distribution of motions matching it, rather than just a
+            single result.
+          </p>
+        </div>
+      </div>
+    </div> -->
+  <!--/ Abstract. -->
+  <!-- </div>
+  </section> -->
+
+
+  <hr>
+  <section class="hero is-small">
+    <div class="hero-body">
+      <div class="container">
+        <div class="column is-centered has-text-centered">
+          <h2 class="title is-4">As well as diverse dances for various music genres</h2>
+        </div>
+        <div id="results-carousel" class="carousel results-carousel">
+          <div class="column is-centered has-text-centered">
+            <video poster="" controls loop playsinline style="padding: 20px; width: 80%">
+              <source src="resources/dance_batch/compr/aistpp_gMH_sFM_cAll_d22_mMH4_ch05_groovenet_gGN_2_000.mp4"
+                type="video/mp4">
+            </video>
+          </div>
+          <div class="column is-centered has-text-centered">
+            <video poster="" controls loop playsinline style="padding: 20px; width: 80%">
+              <source src="resources/dance_batch/compr/aistpp_gJB_sFM_cAll_d08_mJB3_ch11_kthmisc_gCA_1_000.mp4"
+                type="video/mp4">
+            </video>
+          </div>
+          <div class="column is-centered has-text-centered">
+            <video poster="" controls loop playsinline style="padding: 20px; width: 80%">
+              <source src="resources/dance_batch/compr/aistpp_gMH_sFM_cAll_d24_mMH1_ch16_kthstreet_gKR_1_000.mp4"
+                type="video/mp4">
+            </video>
+          </div>
+          <div class="column is-centered has-text-centered">
+            <video poster="" controls loop playsinline style="padding: 20px; width: 80%">
+              <source src="resources/dance_batch/compr/aistpp_gMH_sFM_cAll_d22_mMH4_ch05_kthstreet_gLH_0_000.mp4"
+                type="video/mp4">
+            </video>
+          </div>
+          <div class="column is-centered has-text-centered">
+            <video poster="" controls loop playsinline style="padding: 20px; width: 80%">
+              <source src="resources/dance_batch/compr/aistpp_gMH_sFM_cAll_d23_mMH3_ch11_kthmisc_gCA_2_000.mp4"
+                type="video/mp4">
+            </video>
+          </div>
+          <div class="column is-centered has-text-centered">
+            <video poster="" controls loop playsinline style="padding: 20px; width: 80%">
+              <source src="resources/dance_batch/compr/aistpp_gMH_sFM_cAll_d22_mMH4_ch05_groovenet_gGN_1_000.mp4"
+                type="video/mp4">
+            </video>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section hero is-light">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered has-text-centered">
+        <div class="column is-four-fifths">
+          <h2 class="title is-3">Style control for gesticulation</h2>
+          <div class="content has-text-justified">
+
+            <p>
+              The gesture-generation model can successfully disentangle the stylistic expression in the gestures from
+              the
+              speech. Below we generate gestures in various styles from the same neutral-sounding speech excerpts from
+              the ZeroEGGS dataset:
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!--/ Abstract. -->
+    </div>
+  </section>
+
+
+
+
+
+  <section class="hero is-small">
+    <div class="hero-body">
+      <div class="container">
+        <div class="column is-centered has-text-centered">
+          <p><b>Speech excerpt #1</b></p>
+        </div>
+        <div id="results-carousel" class="carousel results-carousel">
+          <div class="column is-centered has-text-centered">
+            <h2>A person giving a speech:</h2>
+            <video poster="" controls loop playsinline style="padding: 20px; width: 80%">
+              <source src="resources/zeggs/compr/005_Neutral_4_x_1_0_Speech_1_GDS_000.mp4" type="video/mp4">
+            </video>
+          </div>
+          <div class="column is-centered has-text-centered">
+            <h2>A sad person:</h2>
+            <video poster="" controls loop playsinline style="padding: 20px; width: 80%">
+              <source src="resources/zeggs/compr/005_Neutral_4_x_1_0_Sad_1_GDS_000.mp4" type="video/mp4">
+            </video>
+          </div>
+          <div class="column is-centered has-text-centered">
+            <h2>An angry person:</h2>
+            <video poster="" controls loop playsinline style="padding: 20px; width: 80%">
+              <source src="resources/zeggs/compr/005_Neutral_4_x_1_0_Angry_1_GDS_000.mp4" type="video/mp4">
+            </video>
+          </div>
+          <div class="column is-centered has-text-centered">
+            <h2>A flirty person:</h2>
+            <video poster="" controls loop playsinline style="padding: 20px; width: 80%">
+              <source src="resources/zeggs/compr/005_Neutral_4_x_1_0_Flirty_1_GDS_000.mp4" type="video/mp4">
+            </video>
+          </div>
+          <div class="column is-centered has-text-centered">
+            <h2>An old person:</h2>
+            <video poster="" controls loop playsinline style="padding: 20px; width: 80%">
+              <source src="resources/zeggs/compr/005_Neutral_4_x_1_0_Old_1_GDS_000.mp4" type="video/mp4">
+            </video>
+          </div>
+        </div>
+      </div>
+      <div class="column is-centered has-text-centered">
+        <p><b>Speech excerpt #2</b></p>
+      </div>
+      <div id="results-carousel" class="carousel results-carousel">
+        <div class="column is-centered has-text-centered">
+          <h2>A person giving a speech:</h2>
+          <video poster="" controls loop playsinline width="80%" style="padding: 20px; width: 80%">
+            <source src="resources/zeggs/compr/005_Neutral_4_x_1_0_Speech_2_GDS_000.mp4" type="video/mp4">
+          </video>
+        </div>
+        <div class="column is-centered has-text-centered">
+          <h2>A sad person:</h2>
+          <video poster="" controls loop playsinline width="80%" style="padding: 20px; width: 80%">
+            <source src="resources/zeggs/compr/005_Neutral_4_x_1_0_Sad_2_GDS_000.mp4" type="video/mp4">
+          </video>
+        </div>
+        <div class="column is-centered has-text-centered">
+          <h2>An angry person:</h2>
+          <video poster="" controls loop playsinline width="80%" style="padding: 20px; width: 80%">
+            <source src="resources/zeggs/compr/005_Neutral_4_x_1_0_Angry_2_GDS_000.mp4" type="video/mp4">
+          </video>
+        </div>
+        <div class="column is-centered has-text-centered">
+          <h2>A flirty person:</h2>
+          <video poster="" controls loop playsinline width="80%" style="padding: 20px; width: 80%">
+            <source src="resources/zeggs/compr/005_Neutral_4_x_1_0_Flirty_2_GDS_000.mp4" type="video/mp4">
+          </video>
+        </div>
+        <div class="column is-centered has-text-centered">
+          <h2>An old person:</h2>
+          <video poster="" controls loop playsinline width="80%" style="padding: 20px; width: 80%">
+            <source src="resources/zeggs/compr/005_Neutral_4_x_1_0_Old_2_GDS_000.mp4" type="video/mp4">
+          </video>
+        </div>
+      </div>
+    </div>
+    </div>
+  </section>
+
+
+  <section class="section hero is-light">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered has-text-centered">
+        <div class="column is-four-fifths">
+          <h2 class="title is-3">Style control for dancing</h2>
+          <div class="content has-text-justified">
+
+            <p>
+              Similarly, the dance-generation model can synthesise dances in the selected style, even if the music is
+              unchanged.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!--/ Abstract. -->
+    </div>
+  </section>
+  <section class="hero is-small">
+    <div class="hero-body">
+      <div class="container">
+        <div class="column is-centered has-text-centered">
+          <p><b>Music input #1</b></p>
+        </div>
+        <div id="results-carousel" class="carousel results-carousel">
+          <div class="column is-centered has-text-centered">
+            <video poster="" controls loop playsinline width="80%" style="padding: 20px; width: 80%">
+              <source src="resources/dance_batch/compr/aistpp_gMH_sFM_cAll_d24_mMH1_ch16_kthstreet_gKR_1_000.mp4"
+                type="video/mp4">
+            </video>
+          </div>
+          <div class="column is-centered has-text-centered">
+            <video poster="" controls loop playsinline width="80%" style="padding: 20px; width: 80%">
+              <source src="resources/dance_batch/compr/aistpp_gMH_sFM_cAll_d24_mMH1_ch16_kthstreet_gLH_1_000.mp4"
+                type="video/mp4">
+            </video>
+          </div>
+          <div class="column is-centered has-text-centered">
+            <video poster="" controls loop playsinline width="80%" style="padding: 20px; width: 80%">
+              <source src="resources/dance_batch/compr/aistpp_gMH_sFM_cAll_d24_mMH1_ch16_kthmisc_gCA_1_000.mp4"
+                type="video/mp4">
+            </video>
+          </div>
+          <div class="column is-centered has-text-centered">
+            <video poster="" controls loop playsinline width="80%" style="padding: 20px; width: 80%">
+              <source src="resources/dance_batch/compr/aistpp_gMH_sFM_cAll_d24_mMH1_ch16_groovenet_gGN_1_000.mp4"
+                type="video/mp4">
+            </video>
+          </div>
+        </div>
+        <div class="column is-centered has-text-centered">
+          <p><b>Music input #2</b></p>
+        </div>
+        <div id="results-carousel" class="carousel results-carousel">
+          <div class="column is-centered has-text-centered">
+            <video poster="" controls loop playsinline width="80%" style="padding: 20px; width: 80%">
+              <source src="resources/dance_batch/compr/aistpp_gMH_sFM_cAll_d24_mMH1_ch16_kthstreet_gKR_2_000.mp4"
+                type="video/mp4">
+            </video>
+          </div>
+          <div class="column is-centered has-text-centered">
+            <video poster="" controls loop playsinline width="80%" style="padding: 20px; width: 80%">
+              <source src="resources/dance_batch/compr/aistpp_gMH_sFM_cAll_d24_mMH1_ch16_kthstreet_gLH_2_000.mp4"
+                type="video/mp4">
+            </video>
+          </div>
+          <div class="column is-centered has-text-centered">
+            <video poster="" controls loop playsinline width="80%" style="padding: 20px; width: 80%">
+              <source src="resources/dance_batch/compr/aistpp_gMH_sFM_cAll_d24_mMH1_ch16_kthmisc_gCA_2_000.mp4"
+                type="video/mp4">
+            </video>
+          </div>
+          <div class="column is-centered has-text-centered">
+            <video poster="" controls loop playsinline width="80%" style="padding: 20px; width: 80%">
+              <source src="resources/dance_batch/compr/aistpp_gMH_sFM_cAll_d24_mMH1_ch16_groovenet_gGN_2_000.mp4"
+                type="video/mp4">
+            </video>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section hero is-light">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered has-text-centered">
+        <div class="column is-four-fifths">
+          <h2 class="title is-3">Guided interpolation</h2>
+          <div class="content has-text-justified">
+            <p>
+              We propose <emph>guided interpolation</emph>, an extension of the clasifier-free guidance technique that
+              allows us to blend styles. We demonstrate the idea with our locomotion model below.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!--/ Abstract. -->
+    </div>
+  </section>
+
+  <section class="hero is-small">
+
+    <div class="column is-centered has-text-centered">
+      <h3 class="title is-4">Interpolation between two locomotion styles</p>
+        <video poster="" id="tree" autoplay controls muted loop style="padding: 20px; width: 80%">
+          <source src="resources/100Styles_002_compr.mp4" type="video/mp4">
+        </video>
+    </div>
+
+  </section>
+
+  <section class="section" id="BibTeX">
+    <div class="container is-max-desktop content">
+      <h2 class="title">BibTeX</h2>
+      <pre><code>
+@misc{alexanderson2022listen,
+  title={Listen, denoise, action! Audio-driven motion synthesis with diffusion models},
+  author={Simon Alexanderson and Rajmund Nagy and Jonas Beskow and Gustav Eje Henter},
+  year={2022},
+  eprint={2211.09707},
+  archivePrefix={arXiv},
+  primaryClass={cs.LG}
+}</code></pre>
+    </div>
+    </div>
+  </section>
+
+
+
+
+  <footer class="footer">
+    <div class="columns is-centered">
+      <div class="column is-8">
+        <div class="content">
+          <p>
+            This website is licensed under a <a rel="license"
+              href="http://creativecommons.org/licenses/by-sa/4.0/">Creative
+              Commons Attribution-ShareAlike 4.0 International License</a>.
+          </p>
+          <p>
+            Website source code based on the <a href="https://nerfies.github.io/"> Nerfies</a> project page. If
+            you want
+            to reuse their <a href="https://github.com/nerfies/nerfies.github.io">source code</a>, please credit
+            them
+            appropriately.
+          </p>
+        </div>
+      </div>
+    </div>
+    </div>
+  </footer>
+
+</body>
+
+</html>
